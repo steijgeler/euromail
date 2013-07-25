@@ -80,34 +80,4 @@ describe Euromail::SFTPService do
     end
   end
 
-  describe "#development_mode!" do
-    before(:each) do
-      service.development_mode!
-    end
-
-    it "overrides #upload!" do
-      Net::SFTP.should_not receive(:start)
-      $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
-      $stdout.should receive(:puts).with("Uploaded moves_nedap_3.pdf")
-      $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
-      service.upload!('come-client-code', '3')
-    end
-
-    it "overrides #remove!" do
-      Net::SFTP.should_not receive(:start)
-      $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
-      $stdout.should receive(:puts).with("Removed moves_nedap_3.pdf")
-      $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
-      service.remove!('3')
-    end
-
-    it "overrides #connect" do
-      Net::SFTP.should_not receive(:start)
-      $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
-      $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
-      service.connect
-    end
-
-  end
-
 end

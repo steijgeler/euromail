@@ -15,6 +15,7 @@ module Euromail
     end
 
     def test_mode!
+      self.extend(Euromail::SFTPTest)
     end
 
     def development_mode!
