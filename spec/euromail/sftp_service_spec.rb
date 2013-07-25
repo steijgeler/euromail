@@ -7,7 +7,7 @@ def mock_sftp
   @file_hander.stub(:write) do |data|
   end
 
-  @net_sftp_session.stub(:remove) do |filename|
+  @net_sftp_session.stub(:remove!) do |filename|
   end
 
   @net_sftp_session.stub_chain(:file, :open!) do |filename, method, &block|
@@ -55,11 +55,24 @@ describe Euromail::SFTPService do
       service.upload!('some-client-code', '1')
     end
 
-    it "first deletes an existing file" do
+    it "first removes an existing file" do
       filename = service.filename('1')
-      @net_sftp_session.should receive(:remove).with(filename).ordered
+      @net_sftp_session.should receive(:remove!).with(filename).ordered
       @net_sftp_session.file.should receive(:open!).with(filename, 'w').ordered
       service.upload!('some-client-code', '1')
+    end
+  end
+
+  describe "remove!" do
+    it "connects to euromail using the given username and pass" do
+      Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
+      service.remove!('2')
+    end
+
+    it "removes the file from the sftp server" do
+      @net_sftp_session.should receive(:remove!).with( service.filename('2') )
+      @net_sftp_session.file.should_not receive(:open!)
+      service.remove!('2')
     end
   end
 

@@ -15,12 +15,22 @@ module Euromail
     end
 
     def upload! pdf_data, identifier
-      Net::SFTP.start(host, username, :password => password) do |sftp|
-        sftp.remove( filename(identifier) )
+      connect do |sftp|
+        sftp.remove!( filename(identifier) )
         sftp.file.open!( filename(identifier) , "w") do |f|
           f.write pdf_data
         end
       end
+    end
+
+    def remove! identifier
+      connect do |sftp|
+        sftp.remove!( filename(identifier) )
+      end
+    end
+
+    def connect &block
+      Net::SFTP.start(host, username, :password => password, &block)
     end
 
     # Generate a filename based on the application, customer and some unique identifier.
