@@ -4,21 +4,30 @@ module Euromail
 
   class SFTPService
 
-    attr_reader :host, :username, :password
+    attr_reader :application, :customer, :host, :username, :password
 
-    def initialize host, username, password
+    def initialize application, customer, host, username, password
+      @application = application
+      @customer = customer
       @host = host
       @username = username
       @password = password
     end
 
-    def upload! pdf_data, filename
+    def upload! pdf_data, identifier
       Net::SFTP.start(host, username, :password => password) do |sftp|
-        sftp.remove(filename)
-        sftp.file.open!(filename, "w") do |f|
+        sftp.remove( filename(identifier) )
+        sftp.file.open!( filename(identifier) , "w") do |f|
           f.write pdf_data
         end
       end
+    end
+
+    # Generate a filename based on the application, customer and some unique identifier.
+    # The identifier is not allowed to be blank since this risks previous files from being deleted.
+    def filename identifier
+      raise "An identifier is required" if identifier.to_s == ''
+      "#{application}_#{customer}_#{identifier}.pdf"
     end
 
   end

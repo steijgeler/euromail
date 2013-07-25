@@ -26,11 +26,13 @@ describe Euromail::SFTPService do
   end
 
   let(:service) do
-    Euromail::SFTPService.new('some-cheapass-domain.com', "stefan", "super_secret")
+    Euromail::SFTPService.new('moves', 'nedap', 'some-cheapass-domain.com', "stefan", "super_secret")
   end
 
   context "when creating" do
     it "has a host, username and password" do
+      service.application.should eql('moves')
+      service.customer.should eql('nedap')
       service.host.should eql('some-cheapass-domain.com')
       service.username.should eql('stefan')
       service.password.should eql('super_secret')
@@ -38,26 +40,37 @@ describe Euromail::SFTPService do
   end
 
   describe "upload!" do
-
     it "connects to euromail using the given username and pass" do
       Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
-      service.upload!('some-client-code', 'letter.pdf')
+      service.upload!('some-client-code', '1')
     end
 
-    it "use the given filename" do
-      @net_sftp_session.file.should receive(:open!).with('letter.pdf', 'w')
-      service.upload!('some-client-code', 'letter.pdf')
+    it "use the generated filename" do
+      @net_sftp_session.file.should receive(:open!).with( service.filename('1'), 'w')
+      service.upload!('some-client-code', '1')
     end
 
     it "uploads pdf data" do
       @file_hander.should receive(:write).with('some-client-code')
-      service.upload!('some-client-code', 'letter.pdf')
+      service.upload!('some-client-code', '1')
     end
 
     it "first deletes an existing file" do
-      @net_sftp_session.should receive(:remove).with('letter.pdf').ordered
-      @net_sftp_session.file.should receive(:open!).with('letter.pdf', 'w').ordered
-      service.upload!('some-client-code', 'letter.pdf')
+      filename = service.filename('1')
+      @net_sftp_session.should receive(:remove).with(filename).ordered
+      @net_sftp_session.file.should receive(:open!).with(filename, 'w').ordered
+      service.upload!('some-client-code', '1')
+    end
+  end
+
+  describe "filename" do 
+    it "generates a string with application, customer and the given identifier" do
+      service.filename('123').should eql('moves_nedap_123.pdf')
+    end
+
+    it "requires a non empty identifier" do
+      expect{ service.filename('') }.to raise_error
+      expect{ service.filename(nil) }.to raise_error
     end
   end
 
