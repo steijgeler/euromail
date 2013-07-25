@@ -1,4 +1,5 @@
 require 'euromail'
+require 'sftp_mock'
 require 'simplecov'
 require 'simplecov-rcov'
 
@@ -9,4 +10,3 @@ if ENV["COVERAGE"]
     add_filter "/spec/"
   end
 end
-
