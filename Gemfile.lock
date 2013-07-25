@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    euromail (0.0.0)
+    Euromail (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -30,7 +30,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  euromail!
+  Euromail!
   net-sftp
   rspec
   simplecov
