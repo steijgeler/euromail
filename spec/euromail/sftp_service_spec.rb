@@ -30,7 +30,7 @@ describe Euromail::SFTPService do
   end
 
   context "when creating" do
-    it "has a host, username and password" do
+    it "has an application, customer, host, username and password" do
       service.application.should eql('moves')
       service.customer.should eql('nedap')
       service.host.should eql('some-cheapass-domain.com')
@@ -39,7 +39,7 @@ describe Euromail::SFTPService do
     end
   end
 
-  describe "upload!" do
+  describe "#upload!" do
     it "connects to euromail using the given username and pass" do
       Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
       service.upload!('some-client-code', '1')
@@ -74,7 +74,7 @@ describe Euromail::SFTPService do
     end
   end
 
-  describe "remove!" do
+  describe "#remove!" do
     it "connects to euromail using the given username and pass" do
       Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
       service.remove!('2')
@@ -87,7 +87,7 @@ describe Euromail::SFTPService do
     end
   end
 
-  describe "filename" do 
+  describe "#filename" do 
     it "generates a string with application, customer and the given identifier" do
       service.filename('123').should eql('moves_nedap_123.pdf')
     end
@@ -96,6 +96,36 @@ describe Euromail::SFTPService do
       expect{ service.filename('') }.to raise_error
       expect{ service.filename(nil) }.to raise_error
     end
+  end
+
+  describe "#development_mode!" do
+    before(:each) do
+      service.development_mode!
+    end
+
+    it "overrides #upload!" do
+      Net::SFTP.should_not receive(:start)
+      $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
+      $stdout.should receive(:puts).with("Uploaded moves_nedap_3.pdf")
+      $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
+      service.upload!('come-client-code', '3')
+    end
+
+    it "overrides #remove!" do
+      Net::SFTP.should_not receive(:start)
+      $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
+      $stdout.should receive(:puts).with("Removed moves_nedap_3.pdf")
+      $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
+      service.remove!('3')
+    end
+
+    it "overrides #connect" do
+      Net::SFTP.should_not receive(:start)
+      $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
+      $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
+      service.connect
+    end
+
   end
 
 end

@@ -14,6 +14,13 @@ module Euromail
       @password = password
     end
 
+    def test_mode!
+    end
+
+    def development_mode!
+      self.extend(Euromail::SFTPDevelopment)
+    end
+
     def upload! pdf_data, identifier
       begin
         connect do |sftp|
