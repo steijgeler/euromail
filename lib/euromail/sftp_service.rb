@@ -15,11 +15,15 @@ module Euromail
     end
 
     def upload! pdf_data, identifier
-      connect do |sftp|
-        sftp.remove!( filename(identifier) )
-        sftp.file.open!( filename(identifier) , "w") do |f|
-          f.write pdf_data
+      begin
+        connect do |sftp|
+          sftp.remove!( filename(identifier) )
+          sftp.file.open!( filename(identifier) , "w") do |f|
+            f.write pdf_data
+          end
         end
+      rescue
+        remove!(identifier)
       end
     end
 

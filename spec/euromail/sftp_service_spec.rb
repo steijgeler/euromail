@@ -55,10 +55,21 @@ describe Euromail::SFTPService do
       service.upload!('some-client-code', '1')
     end
 
+    it "does not remove the remote file after an upload succeeds" do
+      service.should_not receive(:remove!).with('1')
+      service.upload!('some-client-code', '1')
+    end
+
     it "first removes an existing file" do
       filename = service.filename('1')
       @net_sftp_session.should receive(:remove!).with(filename).ordered
       @net_sftp_session.file.should receive(:open!).with(filename, 'w').ordered
+      service.upload!('some-client-code', '1')
+    end
+
+    it "tries to remove the remote file after an upload fails" do
+      @file_hander.stub(:write).and_raise("Connection dropped")
+      service.should receive(:remove!).with('1')
       service.upload!('some-client-code', '1')
     end
   end
