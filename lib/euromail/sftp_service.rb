@@ -14,8 +14,9 @@ module Euromail
 
     def upload! pdf_data, filename
       Net::SFTP.start(host, username, :password => password) do |sftp|
+        sftp.remove(filename)
         sftp.file.open!(filename, "w") do |f|
-          f.puts pdf_data
+          f.write pdf_data
         end
       end
     end
