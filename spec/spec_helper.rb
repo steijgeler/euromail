@@ -9,3 +9,4 @@ if ENV["COVERAGE"]
     add_filter "/spec/"
   end
 end
+
