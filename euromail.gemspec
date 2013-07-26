@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'euromail'
-  s.version     = '0.2.0'
+  s.version     = '0.3.0'
   s.date        = '2013-07-26'
   s.summary     = ""
   s.description = "Euromail SFTP service"
