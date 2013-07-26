@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = 'Euromail'
+  s.name        = 'euromail'
   s.version     = '0.2.0'
   s.date        = '2013-07-26'
   s.summary     = ""
