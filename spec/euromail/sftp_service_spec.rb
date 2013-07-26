@@ -47,16 +47,16 @@ describe Euromail::SFTPService do
     it "tries to remove the remote file after an upload fails" do
       @file_hander.stub(:write).and_raise("Connection dropped")
       service.should receive(:remove!).with('1')
-      service.upload!('some-client-code', '1')
+      expect{ service.upload!('some-client-code', '1') }.to raise_error
     end
 
     it "returns true if it succeeds" do
-      service.upload!('some-client-code', '2').should be_true
+      expect{ service.upload!('some-client-code', '2') }.to_not raise_error
     end
 
     it "return false if some error occurs" do
       @net_sftp_session.stub_chain(:file, :open).and_raise("Some error")
-      service.upload!('some-client-code', '2').should be_false
+      expect{ service.upload!('some-client-code', '2') }.to raise_error
     end
   end
 
@@ -68,12 +68,12 @@ describe Euromail::SFTPService do
     end
 
     it "returns true if it succeeds" do
-      service.remove!('2').should be_true
+      expect{ service.remove!('2') }.to_not raise_error
     end
 
     it "return false if some error occurs" do
       @net_sftp_session.stub(:remove!).and_raise("Some error")
-      service.remove!('2').should be_false
+      expect{ service.remove!('2') }.to raise_error
     end
   end
 

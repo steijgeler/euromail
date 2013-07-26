@@ -29,25 +29,17 @@ module Euromail
             f.write pdf_data
           end
         end
-      rescue
+      rescue => e
         remove!(identifier)
-        return false
+        raise e
       end
-
-      return true
     end
 
     # Attempt to remove the file for the given identifier. 
     def remove! identifier
-      begin
-        connect do |sftp|
-          sftp.remove!( filename(identifier) )
-        end
-      rescue
-        return false
+      connect do |sftp|
+        sftp.remove!( filename(identifier) )
       end
-
-      return true
     end
     
     def connect &block
