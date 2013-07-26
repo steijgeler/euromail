@@ -9,7 +9,7 @@ module SFTPMock
     @net_sftp_session.stub(:remove!) do |filename|
     end
 
-    @net_sftp_session.stub_chain(:file, :open!) do |filename, method, &block|
+    @net_sftp_session.stub_chain(:file, :open) do |filename, method, &block|
       block.call(@file_hander) if block
     end
 

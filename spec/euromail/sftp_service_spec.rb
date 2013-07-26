@@ -21,14 +21,16 @@ describe Euromail::SFTPService do
     end
   end
 
-  describe "#upload!" do
+  describe "#connect" do
     it "connects to euromail using the given username and pass" do
       Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
-      service.upload!('some-client-code', '1')
+      service.connect {}
     end
+  end
 
+  describe "#upload!" do
     it "use the generated filename" do
-      @net_sftp_session.file.should receive(:open!).with( service.filename('1'), 'w')
+      @net_sftp_session.file.should receive(:open).with( service.filename('1'), 'w')
       service.upload!('some-client-code', '1')
     end
 
@@ -42,36 +44,42 @@ describe Euromail::SFTPService do
       service.upload!('some-client-code', '1')
     end
 
-    it "first removes an existing file" do
-      filename = service.filename('1')
-      @net_sftp_session.should receive(:remove!).with(filename).ordered
-      @net_sftp_session.file.should receive(:open!).with(filename, 'w').ordered
-      service.upload!('some-client-code', '1')
-    end
-
     it "tries to remove the remote file after an upload fails" do
       @file_hander.stub(:write).and_raise("Connection dropped")
       service.should receive(:remove!).with('1')
       service.upload!('some-client-code', '1')
     end
+
+    it "returns true if it succeeds" do
+      service.upload!('some-client-code', '2').should be_true
+    end
+
+    it "return false if some error occurs" do
+      @net_sftp_session.stub_chain(:file, :open).and_raise("Some error")
+      service.upload!('some-client-code', '2').should be_false
+    end
   end
 
   describe "#remove!" do
-    it "connects to euromail using the given username and pass" do
-      Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
+    it "removes the file from the sftp server" do
+      @net_sftp_session.should receive(:remove!).with( service.filename('2') )
+      @net_sftp_session.file.should_not receive(:open)
       service.remove!('2')
     end
 
-    it "removes the file from the sftp server" do
-      @net_sftp_session.should receive(:remove!).with( service.filename('2') )
-      @net_sftp_session.file.should_not receive(:open!)
-      service.remove!('2')
+    it "returns true if it succeeds" do
+      service.remove!('2').should be_true
+    end
+
+    it "return false if some error occurs" do
+      @net_sftp_session.stub(:remove!).and_raise("Some error")
+      service.remove!('2').should be_false
     end
   end
 
   describe "#filename" do 
     it "generates a string with application, customer and the given identifier" do
-      service.filename('123').should eql('moves_nedap_123.pdf')
+      service.filename('123').should eql('./moves_nedap_123.pdf')
     end
 
     it "requires a non empty identifier" do

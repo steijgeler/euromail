@@ -25,22 +25,31 @@ module Euromail
     def upload! pdf_data, identifier
       begin
         connect do |sftp|
-          sftp.remove!( filename(identifier) )
-          sftp.file.open!( filename(identifier) , "w") do |f|
+          sftp.file.open( filename(identifier) , "w") do |f|
             f.write pdf_data
           end
         end
       rescue
         remove!(identifier)
+        return false
       end
+
+      return true
     end
 
+    # Attempt to remove the file for the given identifier. 
     def remove! identifier
-      connect do |sftp|
-        sftp.remove!( filename(identifier) )
+      begin
+        connect do |sftp|
+          sftp.remove!( filename(identifier) )
+        end
+      rescue
+        return false
       end
-    end
 
+      return true
+    end
+    
     def connect &block
       Net::SFTP.start(host, username, :password => password, &block)
     end
@@ -49,7 +58,7 @@ module Euromail
     # The identifier is not allowed to be blank since this risks previous files from being deleted.
     def filename identifier
       raise "An identifier is required" if identifier.to_s == ''
-      "#{application}_#{customer}_#{identifier}.pdf"
+      "./#{application}_#{customer}_#{identifier}.pdf"
     end
 
   end

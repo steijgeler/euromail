@@ -20,7 +20,7 @@ describe Euromail::SFTPService do
       it "only logs uploads" do
         Net::SFTP.should_not receive(:start)
         $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
-        $stdout.should receive(:puts).with("Uploaded moves_nedap_3.pdf")
+        $stdout.should receive(:puts).with("Uploaded ./moves_nedap_3.pdf")
         $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
         service.upload!('come-client-code', '3')
       end
@@ -30,7 +30,7 @@ describe Euromail::SFTPService do
       it "only logs deletes" do
         Net::SFTP.should_not receive(:start)
         $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
-        $stdout.should receive(:puts).with("Removed moves_nedap_3.pdf")
+        $stdout.should receive(:puts).with("Removed ./moves_nedap_3.pdf")
         $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
         service.remove!('3')
       end
