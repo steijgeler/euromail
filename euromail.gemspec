@@ -8,4 +8,6 @@ Gem::Specification.new do |s|
   s.email       = 'stefan.teijgeler@nedap.com'
   s.files       = Dir.glob('{lib,spec}/**/*')
   s.homepage    = 'https://github.com/steijgeler/euromail'
+
+  s.add_runtime_dependency('net-sftp', '>= 2.1.2')
 end
