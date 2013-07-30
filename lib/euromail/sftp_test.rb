@@ -1,36 +1,34 @@
 module Euromail
   module SFTPTest
 
-    attr_writer :uploaded_files, :removed_files
+    class SFTPConnection < Euromail::SFTPConnection
+      def upload pdf_data, identifier
+        @service.uploaded_files = [] if @service.uploaded_files.empty?
+        @service.uploaded_files << @service.filename(identifier)
+      end
 
-    def uploaded_files
-      return @uploaded_files || []
+      def remove identifier
+        @service.removed_files = [] if @service.removed_files.empty?
+        @service.removed_files << @service.filename(identifier)
+      end
     end
 
-    def removed_files
-      return @removed_files || []
-    end
+    module ServiceMethods
+      attr_writer :uploaded_files, :removed_files
 
-    def upload pdf_data, identifier
-      raise "Can only be called in a connect block" unless @sftp
-      
-      @uploaded_files = [] if @uploaded_files.nil?
-      @uploaded_files << filename(identifier)
-    end
+      def uploaded_files
+        return @uploaded_files || []
+      end
 
-    def remove identifier
-      raise "Can only be called in a connect block" unless @sftp
+      def removed_files
+        return @removed_files || []
+      end
 
-      @removed_files = [] if @removed_files.nil?
-      @removed_files << filename(identifier)
-    end
-
-    def connect &block
-      @sftp = 'Dummy'
-      block.call(self)
-      @sftp = nil
+      def connect &block
+        connection = Euromail::SFTPTest::SFTPConnection.new(self, "SFTP dummy")
+        block.call(connection)
+      end
     end
 
   end
-
 end

@@ -17,10 +17,10 @@ describe Euromail::SFTPService do
     end
 
     describe "#upload" do
-      it "must be called in a connect block" do
-        expect{ euromail.upload('some-client-code', '1')}.to raise_error(RuntimeError)
+      it "does not upload anything" do
+        @file_hander.should_not receive(:write)
       end
-
+      
       it "stores uploaded filenames" do
         euromail.uploaded_files.should == []
         euromail.upload!('some-client-code', '1')
@@ -28,11 +28,11 @@ describe Euromail::SFTPService do
       end
     end
 
-    describe "remove" do
-      it "must be called in a connect block" do
-        expect{ euromail.remove('1')}.to raise_error(RuntimeError)
+    describe "#remove" do
+      it "does not remove anything" do
+        @net_sftp_session.should_not receive(:remove!)
       end
-      
+
       it "stores deleted filenames" do
         euromail.removed_files.should == []
         euromail.remove!('2')
@@ -40,7 +40,7 @@ describe Euromail::SFTPService do
       end
     end
 
-    describe "connect" do
+    describe "#connect" do
       it "only calls the block" do
         Net::SFTP.should_not receive(:start)
         $stdout.should_not receive(:puts)

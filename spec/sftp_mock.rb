@@ -1,7 +1,7 @@
 module SFTPMock
   def mock_sftp
     @net_sftp_session = double("Net::SFTP::Session")
-    @file_hander = double("SomeFileHandler")
+    @file_hander = double("Net::SFTP::Operations::File")
 
     @file_hander.stub(:write) do |data|
     end

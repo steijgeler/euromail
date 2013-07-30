@@ -1,7 +1,6 @@
 require 'net/sftp'
 
 module Euromail
-
   class SFTPService
 
     attr_reader :application, :customer, :host, :username, :password
@@ -15,67 +14,43 @@ module Euromail
     end
 
     def test_mode!
-      self.extend(Euromail::SFTPTest)
+      self.extend(Euromail::SFTPTest::ServiceMethods)
     end
 
     def development_mode!
-      self.extend(Euromail::SFTPDevelopment)
-    end
-
-    # Upload pdf data to a file on the remote sftp server. Must be called within a connect block:
-    # euromail.connect do |service|
-    #   service.upload('some-data', '1')
-    # end
-    def upload pdf_data, identifier
-      raise "Can only be called in a connect block" unless @sftp
-      @sftp.file.open( filename(identifier) , "w") do |f|
-        f.write pdf_data
-      end      
+      self.extend(Euromail::SFTPDevelopment::ServiceMethods)
     end
 
     # Attempt to remove the file for the given identifier. If the upload fails or is aborted,
     # this method attempts to remove the incomplete file from the remote server.
     def upload! pdf_data, identifier
       begin
-        connect do |service|
-          service.upload(pdf_data, identifier)
+        connect do |connection|
+          connection.upload(pdf_data, identifier)
         end
       rescue => e
         remove!(identifier)
         raise e
       end
     end
-    
-    # Removes a pdf file on the remote sftp server. Must be called within a connect block:
-    # euromail.connect do |service|
-    #   service.remove('1')
-    # end
-    def remove identifier
-      raise "Can only be called in a connect block" unless @sftp
-      @sftp.remove!( filename(identifier) )
-    end
 
     # Attempt to remove the file for the given identifier. 
     def remove! identifier
-      connect do |service|
-        service.remove( identifier )
+      connect do |connection|
+        connection.remove( identifier )
       end
     end
 
     # Setup a connection to the sftp server. Operations can be defined in the block passed to this method:
-    # euromail.connect do |service|
-    #   service.upload('some data', '1')
-    #   service.upload('more data', '2')
-    #   service.remove('3')
+    # euromail.connect do |connection|
+    #   connection.upload('some data', '1')
+    #   connection.upload('more data', '2')
+    #   connection.remove('3')
     # end
     def connect &block
       Net::SFTP.start(host, username, :password => password) do |sftp|
-        begin
-          @sftp = sftp
-          block.call(self)
-        ensure
-          @sftp = nil
-        end
+        connection = Euromail::SFTPConnection.new(self, sftp)
+        block.call(connection)
       end
     end
 
@@ -87,5 +62,4 @@ module Euromail
     end
 
   end
-
 end

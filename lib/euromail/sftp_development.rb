@@ -1,30 +1,27 @@
 module Euromail
-
   module SFTPDevelopment
 
-    def upload pdf_data, identifier
-      raise "Can only be called in a connect block" unless @sftp
+    class SFTPConnection < Euromail::SFTPConnection
+      def upload pdf_data, identifier
+        $stdout.puts "Uploaded #{@service.filename(identifier)}"
+      end
 
-      $stdout.puts "Uploaded #{filename(identifier)}"
+      def remove identifier
+        $stdout.puts "Removed #{@service.filename(identifier)}"
+      end
     end
 
-    def remove identifier
-      raise "Can only be called in a connect block" unless @sftp
+    module ServiceMethods
+      def connect &block
+        $stdout.puts "Connecting to #{host}"
 
-      $stdout.puts "Removed #{filename(identifier)}"
-    end
+        connection = Euromail::SFTPDevelopment::SFTPConnection.new(self, "SFTP dummy")
+        block.call(connection)
 
-    def connect &block
-      $stdout.puts "Connecting to #{host}"
-
-      @sftp = 'Dummy'
-      block.call(self)
-      @sftp = nil
-
-      $stdout.puts "Connection to #{host} closed"
+        $stdout.puts "Connection to #{host} closed"
+      end
     end
 
   end
-
 end
 

@@ -26,56 +26,6 @@ describe Euromail::SFTPService do
       Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
       euromail.connect {}
     end
-    
-    it "unsets the connection if some error occurs" do
-      expect { 
-        euromail.connect do |service|
-          raise 'boem'
-        end
-      }.to raise_error
-
-      # This should raise an error if the internal sftp connection is cleared
-      expect{ euromail.remove('1') }.to raise_error(RuntimeError)
-    end
-    
-  end
-
-  describe "#upload" do
-    it "use the generated filename" do
-      @net_sftp_session.file.should receive(:open).with( euromail.filename('1'), 'w')
-      euromail.connect do |service|
-        service.upload('some-client-code', '1')
-      end
-    end
-
-    it "must be called within a connect block" do
-      expect{ euromail.upload('some-client-code', '1')}.to raise_error(RuntimeError)
-      expect{
-        euromail.connect do |service|
-          service.upload('some-client-code', '1')
-          service.upload('another-client-code', '2')
-        end
-      }.to_not raise_error
-    end
-
-    it "does not reestablish a connection for each upload" do
-      expect(Net::SFTP).to receive(:start).once
-      euromail.connect do |service|
-        service.upload('some-client-code', '1')
-        service.upload('another-client-code', '2')
-      end
-    end
-
-    it "can upload several pdf files within the same connection" do
-      expect(@net_sftp_session.file).to receive(:open).exactly(2).times
-      @file_hander.should receive(:write).with('some-client-code-1')
-      @file_hander.should receive(:write).with('some-client-code-2')
-
-      euromail.connect do |service|
-        service.upload("some-client-code-1", '1')
-        service.upload("some-client-code-2", '2')
-      end
-    end
   end
 
   describe "#upload!" do
@@ -98,19 +48,6 @@ describe Euromail::SFTPService do
     it "raises if some error occurs" do
       @net_sftp_session.stub_chain(:file, :open).and_raise("Some error")
       expect{ euromail.upload!('some-client-code', '2') }.to raise_error
-    end
-  end
-
-  describe "#remove" do
-    it "removes the file with the generated filename" do
-      @net_sftp_session.should receive(:remove!).with( euromail.filename('1') )
-      euromail.connect do |service|
-        service.remove('1')
-      end
-    end
-
-    it "must be called within a connect block" do
-      expect{ euromail.upload('some-client-code', '1')}.to raise_error(RuntimeError)
     end
   end
 

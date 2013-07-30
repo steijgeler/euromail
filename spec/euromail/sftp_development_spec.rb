@@ -17,39 +17,39 @@ describe Euromail::SFTPService do
     end
 
     describe "#upload" do
-      it "must be called in a connect block" do
-        expect{ euromail.upload('some-client-code', '1')}.to raise_error(RuntimeError)
+      it "does not upload anything" do
+        @file_hander.should_not receive(:write)
       end
 
-      it "only logs uploads" do
+      it "logs uploads" do
         Net::SFTP.should_not receive(:start)
         $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
         $stdout.should receive(:puts).with("Uploaded ./moves_nedap_3.pdf")
         $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
-        euromail.connect do |service|
-          service.upload('come-client-code', '3')
+        euromail.connect do |connection|
+          connection.upload('come-client-code', '3')
         end
       end
     end
 
-    describe "remove" do
-      it "must be called in a connect block" do
-        expect{ euromail.remove('1')}.to raise_error(RuntimeError)
+    describe "#remove" do
+      it "does not remove anything" do
+        @net_sftp_session.should_not receive(:remove!)
       end
 
-      it "only logs deletes" do
+      it "logs deletes" do
         Net::SFTP.should_not receive(:start)
         $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
         $stdout.should receive(:puts).with("Removed ./moves_nedap_3.pdf")
         $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
-        euromail.connect do |service|
-          service.remove('3')
+        euromail.connect do |connection|
+          connection.remove('3')
         end
       end
     end
 
-    describe "connect" do
-      it "only logs the connection" do
+    describe "#connect" do
+      it "logs the connection" do
         Net::SFTP.should_not receive(:start)
         $stdout.should receive(:puts).with("Connecting to some-cheapass-domain.com")
         $stdout.should receive(:puts).with("Connection to some-cheapass-domain.com closed")
