@@ -1,7 +1,8 @@
 PATH
   remote: .
   specs:
-    euromail (0.3.0)
+    euromail (0.4.0)
+      net-sftp (>= 2.1.2)
 
 GEM
   remote: https://rubygems.org/
