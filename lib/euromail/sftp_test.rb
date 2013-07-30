@@ -11,17 +11,24 @@ module Euromail
       return @removed_files || []
     end
 
-    def upload! pdf_data, identifier
+    def upload pdf_data, identifier
+      raise "Can only be called in a connect block" unless @sftp
+      
       @uploaded_files = [] if @uploaded_files.nil?
       @uploaded_files << filename(identifier)
     end
 
-    def remove! identifier
+    def remove identifier
+      raise "Can only be called in a connect block" unless @sftp
+
       @removed_files = [] if @removed_files.nil?
       @removed_files << filename(identifier)
     end
 
     def connect &block
+      @sftp = 'Dummy'
+      block.call(self)
+      @sftp = nil
     end
 
   end

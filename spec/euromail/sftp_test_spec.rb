@@ -7,36 +7,44 @@ describe Euromail::SFTPService do
     mock_sftp
   end
 
-  let(:service) do
+  let(:euromail) do
     Euromail::SFTPService.new('moves', 'nedap', 'some-cheapass-domain.com', "stefan", "super_secret")
   end
 
   context "#test_mode!" do
     before(:each) do
-      service.test_mode!
+      euromail.test_mode!
     end
 
-    describe "#upload!" do
+    describe "#upload" do
+      it "must be called in a connect block" do
+        expect{ euromail.upload('some-client-code', '1')}.to raise_error(RuntimeError)
+      end
+
       it "stores uploaded filenames" do
-        service.uploaded_files.should == []
-        service.upload!('some-client-code', '1')
-        service.uploaded_files.should == [service.filename('1')]
+        euromail.uploaded_files.should == []
+        euromail.upload!('some-client-code', '1')
+        euromail.uploaded_files.should == [euromail.filename('1')]
       end
     end
 
-    describe "remove!" do
+    describe "remove" do
+      it "must be called in a connect block" do
+        expect{ euromail.remove('1')}.to raise_error(RuntimeError)
+      end
+      
       it "stores deleted filenames" do
-        service.removed_files.should == []
-        service.remove!('2')
-        service.removed_files.should == [service.filename('2')]
+        euromail.removed_files.should == []
+        euromail.remove!('2')
+        euromail.removed_files.should == [euromail.filename('2')]
       end
     end
 
     describe "connect" do
-      it "does nothing" do
+      it "only calls the block" do
         Net::SFTP.should_not receive(:start)
         $stdout.should_not receive(:puts)
-        service.connect
+        euromail.connect {}
       end
     end
 
