@@ -19,6 +19,10 @@ describe Euromail::SFTPService do
       euromail.username.should eql('stefan')
       euromail.password.should eql('super_secret')
     end
+
+    it "the current mode is production" do
+      euromail.current_mode.should eql :production
+    end
   end
 
   describe "#connect" do

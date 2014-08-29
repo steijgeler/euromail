@@ -16,6 +16,10 @@ describe Euromail::SFTPService do
       euromail.development_mode!
     end
 
+    it "the current mode is development" do
+      euromail.current_mode.should eql :development
+    end
+
     describe "#upload" do
       it "does not upload anything" do
         @file_hander.should_not receive(:write)

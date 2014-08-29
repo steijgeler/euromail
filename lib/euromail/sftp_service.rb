@@ -3,7 +3,7 @@ require 'net/sftp'
 module Euromail
   class SFTPService
 
-    attr_reader :application, :customer, :host, :username, :password
+    attr_reader :application, :customer, :host, :username, :password, :current_mode
 
     def initialize application, customer, host, username, password
       @application = application
@@ -11,14 +11,17 @@ module Euromail
       @host = host
       @username = username
       @password = password
+      @current_mode = :production
     end
 
     def test_mode!
       self.extend(Euromail::SFTPTest::ServiceMethods)
+      @current_mode = :test
     end
 
     def development_mode!
       self.extend(Euromail::SFTPDevelopment::ServiceMethods)
+      @current_mode = :development
     end
 
     # Attempt to remove the file for the given identifier. If the upload fails or is aborted,
