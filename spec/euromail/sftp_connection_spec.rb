@@ -13,7 +13,7 @@ describe Euromail::SFTPConnection do
 
   describe "#upload" do
     it "use the generated filename" do
-      @net_sftp_session.file.should receive(:open).with( euromail.filename('1'), 'w')
+      @net_sftp_session.should receive(:upload!).with( @string_io, euromail.filename('1') )
       euromail.connect do |connection|
         connection.upload('some-client-code', '1')
       end
@@ -28,9 +28,9 @@ describe Euromail::SFTPConnection do
     end
 
     it "can upload several pdf files within the same connection" do
-      expect(@net_sftp_session.file).to receive(:open).exactly(2).times
-      @file_hander.should receive(:write).with('some-client-code-1')
-      @file_hander.should receive(:write).with('some-client-code-2')
+      expect(@net_sftp_session).to receive(:upload!).exactly(2).times
+      StringIO.should receive(:new).with('some-client-code-1')
+      StringIO.should receive(:new).with('some-client-code-2')
 
       euromail.connect do |connection|
         connection.upload("some-client-code-1", '1')

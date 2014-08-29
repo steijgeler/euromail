@@ -30,7 +30,8 @@ describe Euromail::SFTPService do
 
   describe "#upload!" do
     it "uploads pdf data" do
-      @file_hander.should receive(:write).with('some-client-code')
+      StringIO.should receive(:new).with('some-client-code')
+      @net_sftp_session.should receive(:upload!).with(@string_io, euromail.filename('1'))
       euromail.upload!('some-client-code', '1')
     end
 
@@ -40,13 +41,13 @@ describe Euromail::SFTPService do
     end
 
     it "tries to remove the remote file after an upload fails" do
-      @file_hander.stub(:write).and_raise("Connection dropped")
+      @net_sftp_session.stub(:upload!).and_raise("Connection dropped")
       euromail.should receive(:remove!).with('1')
       expect{ euromail.upload!('some-client-code', '1') }.to raise_error
     end
 
     it "raises if some error occurs" do
-      @net_sftp_session.stub_chain(:file, :open).and_raise("Some error")
+      @net_sftp_session.stub(:upload!).and_raise("Some error")
       expect{ euromail.upload!('some-client-code', '2') }.to raise_error
     end
   end
@@ -54,7 +55,6 @@ describe Euromail::SFTPService do
   describe "#remove!" do
     it "removes the file from the sftp server" do
       @net_sftp_session.should receive(:remove!).with( euromail.filename('2') )
-      @net_sftp_session.file.should_not receive(:open)
       euromail.remove!('2')
     end
 

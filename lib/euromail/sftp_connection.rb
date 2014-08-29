@@ -7,9 +7,8 @@ module Euromail
     end
 
     def upload pdf_data, identifier
-      @sftp.file.open( @service.filename(identifier) , "w") do |f|
-        f.write pdf_data
-      end      
+      io = StringIO.new(pdf_data)
+      @sftp.upload!(io, @service.filename(identifier))
     end
 
     def remove identifier
