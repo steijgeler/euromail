@@ -9,15 +9,15 @@ Usage
 
 Create an instance of the Euromail::SFTPService like this:
 
-EUROMAIL = Euromail::SFTPService.new('some_company', 'some_customer', 'ftp.somehost.com', 'itsme', 'super_secret')
+```EUROMAIL = Euromail::SFTPService.new('some_company', 'some_customer', 'ftp.somehost.com', 'itsme', 'super_secret')```
 
 Upload pdf data like this:
 
-EUROMAIL.upload!('pdf string', '213')
+```EUROMAIL.upload!('pdf string', '213')```
 
 Remove a pdf file like this:
 
-EUROMAIL.remove!('213')
+```EUROMAIL.remove!('213')```
 
 Development and test mode
 =========================
@@ -30,6 +30,8 @@ array keeps track of the uploaded files.
 
 Switch to development or test mode like this:
 
+```
 EUROMAIL.development_mode!
-
 EUROMAIL.test_mode!
+```
+
