@@ -5,12 +5,13 @@ module Euromail
 
     attr_reader :application, :customer, :host, :username, :password, :current_mode
 
-    def initialize application, customer, host, username, password
+    def initialize application, customer, host, username, password, net_ssh_options={}
       @application = application
       @customer = customer
       @host = host
       @username = username
       @password = password
+      @net_ssh_options = net_ssh_options
       @current_mode = :production
     end
 
@@ -37,7 +38,7 @@ module Euromail
       end
     end
 
-    # Attempt to remove the file for the given identifier. 
+    # Attempt to remove the file for the given identifier.
     def remove! identifier
       connect do |connection|
         connection.remove( identifier )
@@ -51,7 +52,8 @@ module Euromail
     #   connection.remove('3')
     # end
     def connect &block
-      Net::SFTP.start(host, username, :password => password) do |sftp|
+      options = {password: password }.merge(@net_ssh_options)
+      Net::SFTP.start(host, username, options) do |sftp|
         connection = Euromail::SFTPConnection.new(self, sftp)
         block.call(connection)
       end
