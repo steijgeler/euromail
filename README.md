@@ -11,6 +11,15 @@ Create an instance of the Euromail::SFTPService like this:
 
 ```EUROMAIL = Euromail::SFTPService.new('some_company', 'some_customer', 'ftp.somehost.com', 'itsme', 'super_secret')```
 
+Is is possible to pass additional Net:SSH options when initializing the SFTPService. These are used when connecting to the sftp service. Supported options are listed here: http://net-ssh.github.io/net-ssh/classes/Net/SSH.html#method-c-start
+
+```
+EUROMAIL = Euromail::SFTPService.new(
+  'some_company', 'some_customer', 'ftp.somehost.com', 'itsme', 'super_secret', 
+  compression: true, config: true
+)
+```
+
 Upload pdf data like this:
 
 ```EUROMAIL.upload!('pdf string', '213')```
