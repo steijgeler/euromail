@@ -11,6 +11,12 @@ describe Euromail::SFTPService do
     Euromail::SFTPService.new('moves', 'nedap', 'some-cheapass-domain.com', "stefan", "super_secret")
   end
 
+  let(:euromail_with_option) do
+    Euromail::SFTPService.new('moves', 'nedap', 'some-cheapass-domain.com', "stefan", "super_secret", {
+        some_option: "test option"
+    })
+  end
+
   context "when creating" do
     it "has an application, customer, host, username and password" do
       expect(euromail.application).to eql('moves')
@@ -29,6 +35,11 @@ describe Euromail::SFTPService do
     it "connects to euromail using the given username and pass" do
       expect(Net::SFTP).to receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
       euromail.connect {}
+    end
+
+    it "connects using additional net_ssh options passed from the user" do
+      expect(Net::SFTP).to receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret', :some_option => "test option")
+      euromail_with_option.connect {}
     end
   end
 
