@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'euromail'
-  s.version     = '0.5.0'
-  s.date        = '2014-08-29'
+  s.version     = '0.6.0'
+  s.date        = '2018-01-31'
   s.summary     = "Gem to upload pdf data to an SFTP server"
   s.description = "Euromail SFTP service"
   s.authors     = ["Stefan Teijgeler"]

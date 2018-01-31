@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    euromail (0.5.0)
+    euromail (0.6.0)
       net-sftp (>= 2.1.2)
 
 GEM
