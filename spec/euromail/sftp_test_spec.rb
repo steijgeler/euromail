@@ -17,37 +17,39 @@ describe Euromail::SFTPService do
     end
 
     it "the current mode is test" do
-      euromail.current_mode.should eql :test
+      expect(euromail.current_mode).to eql :test
     end
 
     describe "#upload" do
       it "does not upload anything" do
-        @file_hander.should_not receive(:write)
+        expect(@file_hander).not_to receive(:write)
+        euromail.upload!('some-client-code', '1')
       end
       
       it "stores uploaded filenames" do
-        euromail.uploaded_files.should == []
+        expect(euromail.uploaded_files).to eql([])
         euromail.upload!('some-client-code', '1')
-        euromail.uploaded_files.should == [euromail.filename('1')]
+        expect(euromail.uploaded_files).to eql([euromail.filename('1')])
       end
     end
 
     describe "#remove" do
       it "does not remove anything" do
-        @net_sftp_session.should_not receive(:remove!)
+        expect(@net_sftp_session).not_to receive(:remove!)
+        euromail.remove!('2')
       end
 
       it "stores deleted filenames" do
-        euromail.removed_files.should == []
+        expect(euromail.removed_files).to eql([])
         euromail.remove!('2')
-        euromail.removed_files.should == [euromail.filename('2')]
+        expect(euromail.removed_files).to eql([euromail.filename('2')])
       end
     end
 
     describe "#connect" do
       it "only calls the block" do
-        Net::SFTP.should_not receive(:start)
-        $stdout.should_not receive(:puts)
+        expect(Net::SFTP).not_to receive(:start)
+        expect($stdout).not_to receive(:puts)
         euromail.connect {}
       end
     end

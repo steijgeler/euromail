@@ -3,18 +3,13 @@ module SFTPMock
     @net_sftp_session = double("Net::SFTP::Session")
     @string_io = double("StringIO")
 
-    @file_hander.stub(:write) do |data|
-    end
+    RSpec::Mocks.configuration.allow_message_expectations_on_nil
+    allow(@file_hander).to receive(:write)
+    allow(@net_sftp_session).to receive(:remove!)
+    allow(@net_sftp_session).to receive(:upload!)
+    allow(StringIO).to receive(:new).and_return(@string_io)
 
-    @net_sftp_session.stub(:remove!) do |filename|
-    end
-
-    @net_sftp_session.stub(:upload!) do |filename|
-    end
-
-    StringIO.stub(:new).and_return(@string_io)
-
-    Net::SFTP.stub(:start) do |host, username, password_hash, &block|
+    allow(Net::SFTP).to receive(:start) do |host, username, password_hash, &block|
       block.call(@net_sftp_session) if block
     end
   end

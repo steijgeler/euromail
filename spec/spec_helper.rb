@@ -10,3 +10,5 @@ if ENV["COVERAGE"]
     add_filter "/spec/"
   end
 end
+
+RSpec::Mocks.configuration.allow_message_expectations_on_nil = true

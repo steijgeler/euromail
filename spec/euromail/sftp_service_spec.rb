@@ -13,69 +13,69 @@ describe Euromail::SFTPService do
 
   context "when creating" do
     it "has an application, customer, host, username and password" do
-      euromail.application.should eql('moves')
-      euromail.customer.should eql('nedap')
-      euromail.host.should eql('some-cheapass-domain.com')
-      euromail.username.should eql('stefan')
-      euromail.password.should eql('super_secret')
+      expect(euromail.application).to eql('moves')
+      expect(euromail.customer).to eql('nedap')
+      expect(euromail.host).to eql('some-cheapass-domain.com')
+      expect(euromail.username).to eql('stefan')
+      expect(euromail.password).to eql('super_secret')
     end
 
     it "the current mode is production" do
-      euromail.current_mode.should eql :production
+      expect(euromail.current_mode).to eql :production
     end
   end
 
   describe "#connect" do
     it "connects to euromail using the given username and pass" do
-      Net::SFTP.should receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
+      expect(Net::SFTP).to receive(:start).with('some-cheapass-domain.com', 'stefan', :password => 'super_secret')
       euromail.connect {}
     end
   end
 
   describe "#upload!" do
     it "uploads pdf data" do
-      StringIO.should receive(:new).with('some-client-code')
-      @net_sftp_session.should receive(:upload!).with(@string_io, euromail.filename('1'))
+      expect(StringIO).to receive(:new).with('some-client-code')
+      expect(@net_sftp_session).to receive(:upload!).with(@string_io, euromail.filename('1'))
       euromail.upload!('some-client-code', '1')
     end
 
     it "does not remove the remote file after an upload succeeds" do
-      euromail.should_not receive(:remove!).with('1')
+      expect(euromail).not_to receive(:remove!).with('1')
       euromail.upload!('some-client-code', '1')
     end
 
     it "tries to remove the remote file after an upload fails" do
-      @net_sftp_session.stub(:upload!).and_raise("Connection dropped")
-      euromail.should receive(:remove!).with('1')
-      expect{ euromail.upload!('some-client-code', '1') }.to raise_error
+      expect(@net_sftp_session).to receive(:upload!).and_raise("Connection dropped")
+      expect(euromail).to receive(:remove!).with('1')
+      expect{ euromail.upload!('some-client-code', '1') }.to raise_error("Connection dropped")
     end
 
     it "raises if some error occurs" do
-      @net_sftp_session.stub(:upload!).and_raise("Some error")
-      expect{ euromail.upload!('some-client-code', '2') }.to raise_error
+      expect(@net_sftp_session).to receive(:upload!).and_raise("Some error")
+      expect{ euromail.upload!('some-client-code', '2') }.to raise_error("Some error")
     end
   end
 
   describe "#remove!" do
     it "removes the file from the sftp server" do
-      @net_sftp_session.should receive(:remove!).with( euromail.filename('2') )
+      expect(@net_sftp_session).to receive(:remove!).with( euromail.filename('2') )
       euromail.remove!('2')
     end
 
     it "raises if some error occurs" do
-      @net_sftp_session.stub(:remove!).and_raise("Some error")
-      expect{ euromail.remove!('2') }.to raise_error
+      expect(@net_sftp_session).to receive(:remove!).and_raise("Some error")
+      expect{ euromail.remove!('2') }.to raise_error("Some error")
     end
   end
 
   describe "#filename" do 
     it "generates a string with application, customer and the given identifier" do
-      euromail.filename('123').should eql('./moves_nedap_123.pdf')
+      expect(euromail.filename('123')).to eql('./moves_nedap_123.pdf')
     end
 
     it "requires a non empty identifier" do
-      expect{ euromail.filename('') }.to raise_error
-      expect{ euromail.filename(nil) }.to raise_error
+      expect{ euromail.filename('') }.to raise_error("An identifier is required")
+      expect{ euromail.filename(nil) }.to raise_error("An identifier is required")
     end
   end
 
